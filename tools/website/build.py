@@ -438,9 +438,15 @@ def store_buttons() -> str:
     return f'<span class="store-btns">{amo_button()}{cws_button()}</span>'
 
 
+def nav_link(label: str, href: str, key: str, section: str) -> str:
+    """One navigation link; `current` is built outside the f-string for Python 3.11."""
+    current = ' aria-current="page"' if key == section else ""
+    return f'<a href="{href}"{current}>{label}</a>'
+
+
 def header(section: str = "") -> str:
     links = "\n        ".join(
-        f'<a href="{href}"{" aria-current=\"page\"" if key == section else ""}>{label}</a>'
+        nav_link(label, href, key, section)
         for label, href, key in NAV
     )
     return f"""<a class="skip-link" href="#main">Skip to content</a>
