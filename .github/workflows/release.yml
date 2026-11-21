@@ -256,18 +256,30 @@ jobs:
 
       # The extension is listed in the Chrome Web Store (ejoleppdfgjdndddcjoehopknmlglojp,
       # crates/ipc STORE_ID): each release's zip is uploaded and sent for review (not waited for);
-      # Chrome, Edge, Brave, Opera and Vivaldi update from the listing. A store refusal (a version
-      # it has already) never fails the release.
+      # Chrome, Edge, Brave, Opera and Vivaldi update from the listing. A store refusal for a
+      # version already uploaded is idempotent and handled explicitly; every other failure fails
+      # the release.
       - name: Send the extension to the Chrome Web Store
         if: ${{ startsWith(github.ref, 'refs/tags/') && steps.keys.outputs.cws == 'true' }}
-        continue-on-error: true
         env:
           CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
           REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
           PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
           EXTENSION_ID: ejoleppdfgjdndddcjoehopknmlglojp
-        run: ./tools/release/node_modules/.bin/chrome-webstore-upload --source target/extension/mdm-chrome-store.zip
+        shell: bash
+        run: |
+          set +e
+          ./tools/release/node_modules/.bin/chrome-webstore-upload --source target/extension/mdm-chrome-store.zip 2>&1 | tee cws-upload.log
+          code=${PIPESTATUS[0]}
+          set -e
+          if [ "$code" -ne 0 ]; then
+            if grep -Eiq 'already (exists|submitted)|duplicate|version .* (exists|already)' cws-upload.log; then
+              echo "::warning::Questa versione e' gia' nel Chrome Web Store."
+              exit 0
+            fi
+            exit "$code"
+          fi
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
