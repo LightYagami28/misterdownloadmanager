@@ -439,9 +439,15 @@ def store_buttons() -> str:
     return f'<span class="store-btns">{amo_button()}{cws_button()}</span>'
 
 
+def nav_link(label: str, href: str, key: str, section: str) -> str:
+    """One navigation link; `current` is built outside the f-string for Python 3.11."""
+    current = ' aria-current="page"' if key == section else ""
+    return f'<a href="{href}"{current}>{label}</a>'
+
+
 def header(section: str = "") -> str:
     links = "\n        ".join(
-        f'<a href="{href}"{" aria-current=\"page\"" if key == section else ""}>{label}</a>'
+        nav_link(label, href, key, section)
         for label, href, key in NAV
     )
     return f"""<a class="skip-link" href="#main">Skip to content</a>
@@ -1078,9 +1084,11 @@ def build_news() -> None:
         <p><a href="{REPO}/releases/tag/v{esc(ver)}">Release page and files on GitHub</a></p>
         {release_thanks(ver)}
       </section>""")
+    news_intro = ('Every release and what it changed, newest first. Follow along with the '
+                  '<a href="/news.xml">news feed</a> or watch the project on GitHub.')
     write("/news.html", f"What's new — {NAME} version history",
           f"Every {NAME} release and what it changed, newest first: new features, fixes and downloads.",
-          f"""{page_head("What's new", f"Every release and what it changed, newest first. Follow along with the <a href=\"/news.xml\">news feed</a> or watch the project on GitHub.", trail)}
+          f"""{page_head("What's new", news_intro, trail)}
     <div class="wrap narrow prose page-body">
       {"".join(parts)}
       {page_tools("CHANGELOG.md", "/news.html", "What's new")}
