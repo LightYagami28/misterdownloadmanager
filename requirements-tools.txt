@@ -1,0 +1,8 @@
+# Dipendenze Python esterne usate dagli script in tools/ (SCA con pip-audit).
+Babel>=2.14
+Markdown>=3.5
+Pillow>=10.0
+PyGithub>=2.0
+numpy>=1.24
+python-barcode>=0.15
+scipy>=1.11
