@@ -1083,9 +1083,11 @@ def build_news() -> None:
         <p><a href="{REPO}/releases/tag/v{esc(ver)}">Release page and files on GitHub</a></p>
         {release_thanks(ver)}
       </section>""")
+    news_intro = ('Every release and what it changed, newest first. Follow along with the '
+                  '<a href="/news.xml">news feed</a> or watch the project on GitHub.')
     write("/news.html", f"What's new — {NAME} version history",
           f"Every {NAME} release and what it changed, newest first: new features, fixes and downloads.",
-          f"""{page_head("What's new", f"Every release and what it changed, newest first. Follow along with the <a href=\"/news.xml\">news feed</a> or watch the project on GitHub.", trail)}
+          f"""{page_head("What's new", news_intro, trail)}
     <div class="wrap narrow prose page-body">
       {"".join(parts)}
       {page_tools("CHANGELOG.md", "/news.html", "What's new")}
