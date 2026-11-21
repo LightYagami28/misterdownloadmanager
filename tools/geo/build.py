@@ -110,7 +110,7 @@ def download():
                     pass
             os.replace(src + ".part", src)
             return src
-        except Exception as e:  # noqa: BLE001 - any failure: the next month, or none
+        except (OSError, ValueError, EOFError) as e:  # any failure: the next month, or none
             tried.append(f"{month}: {e}")
             if os.path.exists(src + ".part"):
                 os.remove(src + ".part")

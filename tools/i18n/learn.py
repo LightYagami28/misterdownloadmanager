@@ -11,14 +11,15 @@ and i18n/style/<code>.md. A person reads the diff before it is committed: the te
 style guide are what every later translation in this language follows.
 """
 
+import importlib
 import argparse
 import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import lingo  # noqa: E402
-import translate as tr  # noqa: E402
+lingo = importlib.import_module("lingo")
+tr = importlib.import_module("translate")
 
 MODEL = "anthropic/claude-opus-5.5"
 

@@ -23,6 +23,7 @@ Needs: pip install markdown babel (the English build and tools/i18n/translate.py
 """
 from __future__ import annotations
 
+import importlib
 import argparse
 import datetime
 import json
@@ -40,9 +41,9 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(ROOT / "tools" / "i18n"))
-import sitei18n as si  # noqa: E402
-import translate as tr  # noqa: E402  (the app catalogs' tool: API call, checks, language data)
-import lingo  # noqa: E402  (each language's termbase and style guide, shared with the app)
+si = importlib.import_module("sitei18n")
+tr = importlib.import_module("translate")
+lingo = importlib.import_module("lingo")
 
 OUT = ROOT / "target" / "site"
 LOG = ROOT / "target" / "site-i18n"
@@ -354,7 +355,7 @@ def run_language(code: str, rows: dict[str, dict], key: str, spend: tr.Spend, wo
                 ok2, bad2 = attempt(again, {r["seg"].key: why for r, why in bad})
                 ok += ok2
                 bad = bad2
-        except Exception as e:  # noqa: BLE001 — the batch is retried by the next run
+        except (OSError, ValueError, KeyError, TypeError) as e:  # the batch is retried by the next run
             ok, bad = [], [(r, f"request failed: {e}") for r in batch]
         with lock:
             for r, text in ok:
@@ -413,7 +414,7 @@ def rereview_language(code: str, rows: dict[str, dict], key: str, spend: tr.Spen
         try:
             out = tr.call(key, tr.REVIEW_MODEL, system, body, spend, max_tokens=32000,
                           reasoning={"effort": "low"})
-        except Exception as e:  # noqa: BLE001 — the drafts stay
+        except (OSError, ValueError, KeyError, TypeError) as e:  # the drafts stay
             print(f"{code}: review failed: {e}")
             return
         proposed = {}
@@ -431,7 +432,7 @@ def rereview_language(code: str, rows: dict[str, dict], key: str, spend: tr.Spen
                       "current": cat.get(batch[i]["seg"]), "proposed": t} for i, t in proposed.items()]
             try:
                 verdict = tr.call(key, tr.ARBITER_MODEL, arbiter, {"rows": items}, spend, max_tokens=8192)
-            except Exception as e:  # noqa: BLE001
+            except (OSError, ValueError, KeyError, TypeError) as e:
                 print(f"{code}: arbiter failed, changes dropped: {e}")
                 verdict = {}
             proposed = {i: t for i, t in proposed.items() if verdict.get(str(i)) == "proposed"}

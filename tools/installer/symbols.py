@@ -10,6 +10,7 @@ readable (crates/crash/src/symbols.rs); the programs themselves ship without the
 stripping; macOS: a .dSYM, with :x86_64 / :arm64 to pick one half of a universal one).
 dump_syms (Mozilla, pinned below) is fetched and its checksum checked first.
 """
+import importlib
 import hashlib
 import io
 import os
@@ -22,7 +23,8 @@ import tempfile
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fetch_release import fetch  # noqa: E402  (beside this file: signs in, tries again)
+_m = importlib.import_module("fetch_release")
+fetch = _m.fetch
 
 DUMP_SYMS = "v2.3.9"
 

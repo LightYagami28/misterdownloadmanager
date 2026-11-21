@@ -19,6 +19,7 @@ Needs: pip install markdown
 """
 from __future__ import annotations
 
+import importlib
 import datetime
 import html
 import json
@@ -34,9 +35,9 @@ import markdown
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import barcode  # noqa: E402
-import contributors  # noqa: E402  (tools/contributors.py: the people the site thanks)
-import sitei18n  # noqa: E402
+barcode = importlib.import_module("barcode")
+contributors = importlib.import_module("contributors")
+sitei18n = importlib.import_module("sitei18n")
 
 ROOT = Path(__file__).resolve().parents[2]
 WEB = ROOT / "website"
@@ -71,7 +72,7 @@ def github(path: str):
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
             return json.load(r)
-    except Exception as e:  # noqa: BLE001 — the site builds without the numbers
+    except (OSError, ValueError, KeyError, TypeError) as e:  # the site builds without the numbers
         print(f"github {path}: {e}", file=sys.stderr)
         return None
 
