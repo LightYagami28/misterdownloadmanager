@@ -19,12 +19,13 @@ import argparse
 import json
 import sys
 import time
+import importlib
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import lingo  # noqa: E402
-import translate as tr  # noqa: E402
+lingo = importlib.import_module("lingo")
+tr = importlib.import_module("translate")
 
 JUDGE = "openai/gpt-6.1-sol"
 REVIEWER = "anthropic/claude-sonnet-5.5"

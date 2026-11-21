@@ -27,13 +27,15 @@ notes with the text.
 labels of its self-test.
 """
 
+import importlib
 import json
 import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from wrap import split_args  # noqa: E402
+_m = importlib.import_module("wrap")
+split_args = _m.split_args
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "crates" / "app" / "src"

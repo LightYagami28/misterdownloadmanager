@@ -14,6 +14,7 @@ Warm-up runs are excluded; failed runs are counted and reported, never dropped s
 """
 
 import argparse
+import importlib
 import json
 import shutil
 import sys
@@ -24,7 +25,8 @@ import numpy as np
 from scipy.stats import mannwhitneyu
 
 sys.path.insert(0, str(Path(__file__).parent))
-from bench import ROOT, SCENARIOS  # noqa: E402
+bench = importlib.import_module("bench")
+ROOT, SCENARIOS = bench.ROOT, bench.SCENARIOS
 
 RNG = np.random.default_rng(20261030)
 BOOT = 10_000
