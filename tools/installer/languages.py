@@ -13,6 +13,7 @@ Rows already translated are kept; a re-run only sends what is new. Inno's `%1`, 
 go to the model as `{1}`, a line break and `{name}`, and come back.
 """
 
+import importlib
 import argparse
 import ctypes
 import re
@@ -24,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools" / "i18n"))
-import translate as T  # noqa: E402
+T = importlib.import_module("translate")
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "languages"
@@ -171,7 +172,7 @@ def main():
                 for f in as_completed(futures):
                     try:
                         code, retry, was_retry = f.result()
-                    except Exception as e:
+                    except (OSError, ValueError, KeyError, TypeError) as e:
                         print(f"request failed: {e}")
                         continue
                     if retry and not was_retry:

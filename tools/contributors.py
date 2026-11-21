@@ -133,7 +133,7 @@ def activity(repo: str = REPO, since: str = "") -> list[dict] | None:
         issues = _pages(f"repos/{repo}/issues", {"state": "all", **p})
         comments = _pages(f"repos/{repo}/issues/comments", p)
         reviews = _pages(f"repos/{repo}/pulls/comments", p)
-    except Exception as e:  # noqa: BLE001 — every caller goes on without the people
+    except (OSError, ValueError, KeyError, TypeError) as e:  # every caller goes on without the people
         log(f"GitHub couldn't be read ({e}); going on without the contributors")
         _ACTIVITY[key] = None
         return None
@@ -153,7 +153,7 @@ def releases(repo: str = REPO) -> list[dict] | None:
     GitHub can't be read."""
     try:
         rel = _pages(f"repos/{repo}/releases")
-    except Exception as e:  # noqa: BLE001
+    except (OSError, ValueError, KeyError, TypeError) as e:
         log(f"the releases couldn't be read ({e})")
         return None
     out = [{"tag": r["tag_name"], "version": r["tag_name"].lstrip("v"), "at": r["published_at"]}
