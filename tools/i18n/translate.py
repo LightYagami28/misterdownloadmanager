@@ -22,6 +22,7 @@ invisible characters, names kept, and the language's script. A row that fails go
 with the reason; a row that fails twice stays English (craft-i18n falls back) and is listed.
 """
 
+import importlib
 import argparse
 import json
 import os
@@ -39,7 +40,7 @@ from pathlib import Path
 from babel import Locale
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import lingo  # noqa: E402
+lingo = importlib.import_module("lingo")
 
 ROOT = Path(__file__).resolve().parents[2]
 I18N = ROOT / "i18n"
@@ -288,7 +289,7 @@ def plural_forms(code):
         tag = language
     try:
         rule = Locale.parse(tag).plural_form
-    except Exception:
+    except (ValueError, LookupError, KeyError):
         return [("other", "any number")]
     seen = {}
     for n in range(0, 1001):
@@ -780,7 +781,7 @@ def main():
             for f in as_completed(futures):
                 try:
                     code, retry, was_retry = f.result()
-                except Exception as e:
+                except (OSError, ValueError, KeyError, TypeError) as e:
                     print(f"request failed: {e}")
                     continue
                 if retry and not was_retry:
