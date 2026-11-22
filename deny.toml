@@ -11,12 +11,20 @@ confidence-threshold = 0.8
 allow = [
     "0BSD",
     "Apache-2.0",
+    # Licenze di dipendenze transitive approvate per uso locale/self-hosted,
+    # nessuna distribuzione di codice.
+    "Apache-2.0 WITH LLVM-exception",
+    "BSL-1.0",
     "BSD-2-Clause",
     "BSD-3-Clause",
     "CC0-1.0",
+    "CDLA-Permissive-2.0",
+    "GPL-3.0-or-later",
     "ISC",
     "MIT",
     "MPL-2.0",
+    "OFL-1.1",
+    "Ubuntu-font-1.0",
     "Unicode-3.0",
     "Unicode-DFS-2016",
     "Unlicense",
@@ -26,9 +34,20 @@ allow = [
 [bans]
 multiple-versions = "allow"
 wildcards = "deny"
+# Le dipendenze path/git dei crate di workspace privati (publish = false) non
+# hanno una versione dichiarata: sono già pinnate da percorso o rev.
+allow-wildcard-paths = true
 highlight = "all"
 
 [sources]
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+# Soli URL git pinnati per rev in Cargo.lock, approvati per uso locale/self-hosted.
+allow-git = [
+    "https://github.com/anefzaoui/egui",
+    "https://github.com/anefzaoui/rqbit",
+    "https://github.com/anefzaoui/wgpu",
+    "https://github.com/storytold/craft-libs",
+    "https://github.com/storytold/winit",
+]
