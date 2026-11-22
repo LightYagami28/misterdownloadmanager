@@ -13,7 +13,6 @@ import hashlib
 import http.server
 import json
 import os
-import random
 import re
 import shutil
 import struct
@@ -108,7 +107,8 @@ def main():
         sys.exit(f"misterdownloadmanager-mcp --version: {out.returncode} {out.stdout!r} {out.stderr!r}")
     print(out.stdout.strip())
 
-    body = random.Random(668).randbytes(SIZE)
+    # Deterministic payload (SHAKE is a hash, not a PRNG): the same bytes on every run.
+    body = hashlib.shake_256(b"mdm-smoke-668").digest(SIZE)
     server, url = serve(body)
     work = tempfile.mkdtemp(prefix="mdm-smoke-")
     try:

@@ -37,9 +37,9 @@ import os
 import re
 import sys
 import time
-import urllib.error
 import urllib.parse
-import urllib.request
+
+import requests
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,20 +72,23 @@ def _get(url: str) -> tuple[object, dict]:
         headers["Authorization"] = f"Bearer {_token()}"
     for attempt in range(4):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=20) as r:
-                return json.load(r), dict(r.headers)
-        except urllib.error.HTTPError as e:
-            wait = e.headers.get("Retry-After")
-            if e.code in (403, 429) and e.headers.get("X-RateLimit-Remaining") == "0":
-                reset = e.headers.get("X-RateLimit-Reset")
+            r = requests.get(url, headers=headers, timeout=20)
+            r.raise_for_status()
+            return r.json(), dict(r.headers)
+        except requests.HTTPError as e:
+            status = e.response.status_code if e.response is not None else 0
+            hdrs = e.response.headers if e.response is not None else {}
+            wait = hdrs.get("Retry-After")
+            if status in (403, 429) and hdrs.get("X-RateLimit-Remaining") == "0":
+                reset = hdrs.get("X-RateLimit-Reset")
                 when = datetime.datetime.fromtimestamp(int(reset), datetime.timezone.utc).strftime("%H:%M UTC") if reset else "later"
                 raise RuntimeError(f"GitHub's rate limit is used up until {when}"
                                    f"{'' if _token() else ' (set GITHUB_TOKEN for more)'}") from e
-            if e.code in (403, 429) and wait and wait.isdigit() and int(wait) <= 60 and attempt < 3:
+            if status in (403, 429) and wait and wait.isdigit() and int(wait) <= 60 and attempt < 3:
                 time.sleep(int(wait))
                 continue
             # A passing hiccup on GitHub's side (502, 503, 504): try again shortly.
-            if e.code in (500, 502, 503, 504) and attempt < 3:
+            if status in (500, 502, 503, 504) and attempt < 3:
                 time.sleep(2 * (attempt + 1))
                 continue
             raise
@@ -272,9 +275,10 @@ def refresh_readme() -> int:
     for p in people:
         name = f"{p['login'].lower()}.png"
         keep.add(name)
-        req = urllib.request.Request(avatar(p["avatar"], README_SIZE), headers={"User-Agent": "misterdownloadmanager-contributors"})
-        with urllib.request.urlopen(req, timeout=20) as r:
-            png = round_png(r.read(), README_SIZE)
+        r = requests.get(avatar(p["avatar"], README_SIZE),
+                         headers={"User-Agent": "misterdownloadmanager-contributors"}, timeout=20)
+        r.raise_for_status()
+        png = round_png(r.content, README_SIZE)
         target = README_AVATARS / name
         if not target.is_file() or target.read_bytes() != png:
             target.write_bytes(png)

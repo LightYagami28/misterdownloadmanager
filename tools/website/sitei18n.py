@@ -142,7 +142,9 @@ class Segment:
 
 def seg_key(kind: str, text: str) -> str:
     """The catalog's key for a source text (the same text anywhere is translated once)."""
-    return hashlib.sha1(f"{kind}\0{text}".encode("utf-8")).hexdigest()[:16]
+    # Stable catalog identifier, not a security hash: changing it would invalidate every
+    # existing translation. usedforsecurity=False states that explicitly (Python 3.9+).
+    return hashlib.sha1(f"{kind}\0{text}".encode("utf-8"), usedforsecurity=False).hexdigest()[:16]
 
 
 def norm(s: str) -> str:

@@ -26,17 +26,16 @@ import importlib
 import argparse
 import json
 import os
-import random
 import re
+import secrets
 import sys
 import threading
 import time
 import unicodedata
-import urllib.error
-import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
+import requests
 from babel import Locale
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -457,12 +456,12 @@ def call(key, model, system, items, spend, max_tokens=8192, reasoning=None):
         "max_tokens": max_tokens,
     }).encode("utf-8")
     for attempt in range(8):
-        req = urllib.request.Request(URL, data=body, headers={
-            "Authorization": f"Bearer {key}", "Content-Type": "application/json",
-            "X-Title": "Mister Download Manager i18n"})
+        headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json",
+                   "X-Title": "Mister Download Manager i18n"}
         try:
-            with urllib.request.urlopen(req, timeout=180) as r:
-                data = json.loads(r.read().decode("utf-8"))
+            r = requests.post(URL, data=body, headers=headers, timeout=180)
+            r.raise_for_status()
+            data = r.json()
             spend.add(data.get("usage") or {})
             text = data["choices"][0]["message"]["content"]
             text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip())
@@ -480,13 +479,14 @@ def call(key, model, system, items, spend, max_tokens=8192, reasoning=None):
             if not isinstance(out, dict):
                 raise json.JSONDecodeError("not an object", text, 0)
             return out
-        except urllib.error.HTTPError as e:
-            if e.code not in (408, 429, 500, 502, 503, 504):
-                raise RuntimeError(f"HTTP {e.code}: {e.read()[:300]!r}")
+        except requests.HTTPError as e:
+            status = e.response.status_code if e.response is not None else 0
+            if status not in (408, 429, 500, 502, 503, 504):
+                raise RuntimeError(f"HTTP {status}: {e.response.content[:300]!r}") from e
         # A dropped or reset connection (ConnectionResetError is an OSError) is tried again too.
-        except (urllib.error.URLError, OSError, json.JSONDecodeError, KeyError, IndexError):
+        except (requests.RequestException, OSError, json.JSONDecodeError, KeyError, IndexError):
             pass
-        time.sleep(min(60, 2 ** attempt) * (0.5 + random.random()))
+        time.sleep(min(60, 2 ** attempt) * (0.5 + secrets.SystemRandom().random()))
     raise RuntimeError("gave up after 8 attempts")
 
 

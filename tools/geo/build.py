@@ -31,7 +31,8 @@ import ipaddress
 import lzma
 import os
 import sys
-import urllib.request
+
+import requests
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT = os.path.join(ROOT, "crates", "geo", "data")
@@ -103,7 +104,11 @@ def download():
             return src
         print("downloading", url)
         try:
-            urllib.request.urlretrieve(url, src + ".part")
+            with requests.get(url, stream=True, timeout=120) as r:
+                r.raise_for_status()
+                with open(src + ".part", "wb") as f:
+                    for chunk in r.iter_content(chunk_size=1 << 20):
+                        f.write(chunk)
             # Whole and readable before it's used.
             with gzip.open(src + ".part", "rt", encoding="utf-8") as f:
                 for _ in f:

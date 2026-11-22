@@ -14,8 +14,13 @@ after. learn.py learns from them; eval_reviews.py measures the pipeline against 
 """
 
 import re
+import shutil
 import subprocess
 from pathlib import Path
+
+GIT = shutil.which("git")
+if GIT is None:
+    raise RuntimeError("git not found on PATH")
 
 ROOT = Path(__file__).resolve().parents[2]
 I18N = ROOT / "i18n"
@@ -112,7 +117,7 @@ def parse_catalog(text):
 
 
 def _git(*args):
-    return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True,
+    return subprocess.run([GIT, *args], cwd=ROOT, capture_output=True, text=True,
                           encoding="utf-8", check=False).stdout
 
 

@@ -5,8 +5,13 @@ repository, for the site's License page. Run after changing dependencies:
 
     python tools/website/third_party.py
 """
+import shutil
 import subprocess
 from pathlib import Path
+
+CARGO = shutil.which("cargo")
+if CARGO is None:
+    raise RuntimeError("cargo not found on PATH")
 
 ROOT = Path(__file__).resolve().parents[2]
 OURS = {"mdm-app", "mdm-cli", "mdm-nmhost", "mdm-engine", "mdm-ipc", "mdm-tools", "mdm-torrent"}
@@ -14,7 +19,7 @@ OURS = {"mdm-app", "mdm-cli", "mdm-nmhost", "mdm-engine", "mdm-ipc", "mdm-tools"
 rows = set()
 for package in ("mdm-app", "mdm-cli", "mdm-nmhost"):
     out = subprocess.run(
-        ["cargo", "tree", "-p", package, "-e", "normal,build", "--prefix", "none", "--target", "all",
+        [CARGO, "tree", "-p", package, "-e", "normal,build", "--prefix", "none", "--target", "all",
          "-f", "{p}\t{l}\t{r}"],
         cwd=ROOT, capture_output=True, text=True, check=True).stdout
     for line in out.splitlines():

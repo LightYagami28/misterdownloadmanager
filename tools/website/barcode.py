@@ -17,7 +17,8 @@ PATTERNS = (
     "211214 211232 2331112"
 ).split()
 START_B, STOP = 104, 106
-assert len(PATTERNS) == 107 and all(sum(map(int, p)) == 11 for p in PATTERNS[:106])
+if len(PATTERNS) != 107 or any(sum(map(int, p)) != 11 for p in PATTERNS[:106]):
+    raise RuntimeError("Code 128 pattern table is corrupt")
 
 
 def symbols(text: str) -> list[int]:

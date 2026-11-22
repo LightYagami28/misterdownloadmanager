@@ -47,6 +47,9 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+GIT = shutil.which("git")
+if GIT is None:
+    raise RuntimeError("git not found on PATH")
 LIST = ROOT / "tools" / "shots" / "shots.toml"
 OUT = ROOT / "docs" / "images" / "help"
 RAW = ROOT / "target" / "shots" / "raw"
@@ -332,7 +335,7 @@ TEXT = (".md", ".html", ".py", ".ps1", ".mjs", ".js", ".css", ".toml", ".yml", "
 
 def budget() -> list[str]:
     """#186: no screenshot over 300 KB, no PNG where WebP belongs, no picture that nothing shows."""
-    files = subprocess.run(["git", "ls-files", "-co", "--exclude-standard"], cwd=ROOT,
+    files = subprocess.run([GIT, "ls-files", "-co", "--exclude-standard"], cwd=ROOT,
                            capture_output=True, text=True, check=True).stdout.splitlines()
     pics = [f for f in files
             if (f.startswith("docs/images/") and not f.startswith("docs/images/help/") or f.startswith(SCREEN_DIRS))

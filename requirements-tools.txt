@@ -5,4 +5,5 @@ Pillow>=10.0
 PyGithub>=2.0
 numpy>=1.24
 python-barcode>=0.15
+requests>=2.31
 scipy>=1.11

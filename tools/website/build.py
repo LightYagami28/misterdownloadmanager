@@ -28,10 +28,10 @@ import re
 import shutil
 import sys
 import urllib.parse
-import urllib.request
 from pathlib import Path
 
 import markdown
+import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -65,13 +65,13 @@ CARGO_VERSION = re.search(r'(?m)^version\s*=\s*"([^"]+)"', (ROOT / "Cargo.toml")
 
 def github(path: str):
     """GET api.github.com/<path> as JSON, or None (offline, rate-limited)."""
-    req = urllib.request.Request(f"https://api.github.com/{path}", headers={
-        "Accept": "application/vnd.github+json", "User-Agent": "misterdownloadmanager-site"})
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "misterdownloadmanager-site"}
     if os.environ.get("GITHUB_TOKEN"):
-        req.add_header("Authorization", f"Bearer {os.environ['GITHUB_TOKEN']}")
+        headers["Authorization"] = f"Bearer {os.environ['GITHUB_TOKEN']}"
     try:
-        with urllib.request.urlopen(req, timeout=15) as r:
-            return json.load(r)
+        r = requests.get(f"https://api.github.com/{path}", headers=headers, timeout=15)
+        r.raise_for_status()
+        return r.json()
     except (OSError, ValueError, KeyError, TypeError) as e:  # the site builds without the numbers
         print(f"github {path}: {e}", file=sys.stderr)
         return None

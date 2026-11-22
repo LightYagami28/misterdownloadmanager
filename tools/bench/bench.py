@@ -22,14 +22,28 @@ import datetime as dt
 import json
 import os
 import platform
+import shutil
 import subprocess
 import sys
 import threading
 import time
-import urllib.request
+
+import requests
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def tool(name):
+    """Absolute path of a system tool, so PATH can't pick a different executable."""
+    path = shutil.which(name)
+    if path is None:
+        sys.exit(f"{name} not found on PATH")
+    return path
+
+
+POWERSHELL, TASKLIST, NETSTAT, GIT = (tool(n) for n in ("powershell", "tasklist", "netstat", "git"))
+
 IDM_EXE = Path(r"C:\Program Files (x86)\Internet Download Manager\IDMan.exe")
 MDM_EXE = ROOT / "target" / "release" / "misterdownloadmanager.exe"
 LAB_EXE = ROOT / "target" / "release" / "labserver.exe"
@@ -103,7 +117,7 @@ def windows_of(pids):
 
 
 def vscode_area():
-    r = subprocess.run(["powershell", "-NoProfile", "-File", str(ROOT / "tools/lab/vscode-monitor.ps1")],
+    r = subprocess.run([POWERSHELL, "-NoProfile", "-File", str(ROOT / "tools/lab/vscode-monitor.ps1")],
                        capture_output=True, text=True)
     x, y, w, h = (int(v) for v in r.stdout.split())
     return x, y, w, h
@@ -147,7 +161,7 @@ class Sampler(threading.Thread):
 
 # ---- runs --------------------------------------------------------------------------------
 def pid_of(image):
-    r = subprocess.run(["tasklist", "/FI", f"IMAGENAME eq {image}", "/FO", "CSV", "/NH"],
+    r = subprocess.run([TASKLIST, "/FI", f"IMAGENAME eq {image}", "/FO", "CSV", "/NH"],
                        capture_output=True, text=True)
     pids = [int(line.split('","')[1]) for line in r.stdout.splitlines() if line.startswith('"')]
     return pids
@@ -157,15 +171,14 @@ def calibrate(name):
     """One tiny request: its midpoint on our clock against its start on the server's lets the
     server's log be read on our clock (loopback: within about a millisecond)."""
     a = time.perf_counter()
-    with urllib.request.urlopen(f"http://127.0.0.1:{PORT}/gen/1/cal-{name}", timeout=5) as r:
-        r.read()
+    requests.get(f"http://127.0.0.1:{PORT}/gen/1/cal-{name}", timeout=5)
     b = time.perf_counter()
     return round((a + b) / 2 * 1000, 3)
 
 
 def lingering():
     """Closed connections to the lab server still in TIME_WAIT (either side)."""
-    r = subprocess.run(["netstat", "-an", "-p", "TCP"], capture_output=True, text=True)
+    r = subprocess.run([NETSTAT, "-an", "-p", "TCP"], capture_output=True, text=True)
     return sum(1 for line in r.stdout.splitlines()
                if "TIME_WAIT" in line and f":{PORT} " in line + " ")
 
@@ -280,16 +293,16 @@ def main():
     env = {
         "date": dt.datetime.now().isoformat(timespec="seconds"),
         "os": platform.platform(),
-        "cpu": subprocess.run(["powershell", "-NoProfile", "-Command",
+        "cpu": subprocess.run([POWERSHELL, "-NoProfile", "-Command",
                                "(Get-CimInstance Win32_Processor).Name"], capture_output=True, text=True).stdout.strip(),
-        "ram_gb": round(int(subprocess.run(["powershell", "-NoProfile", "-Command",
+        "ram_gb": round(int(subprocess.run([POWERSHELL, "-NoProfile", "-Command",
                                             "(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory"],
                                            capture_output=True, text=True).stdout.strip()) / 2**30, 1),
         "disk": "C: (both clients' destination and IDM's temp folder)",
-        "idm_version": subprocess.run(["powershell", "-NoProfile", "-Command",
+        "idm_version": subprocess.run([POWERSHELL, "-NoProfile", "-Command",
                                        f"(Get-Item '{IDM_EXE}').VersionInfo.FileVersion"],
                                       capture_output=True, text=True).stdout.strip(),
-        "mdm_commit": subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"],
+        "mdm_commit": subprocess.run([GIT, "-C", str(ROOT), "rev-parse", "--short", "HEAD"],
                                      capture_output=True, text=True).stdout.strip(),
         "server": f"labserver (this repo), 127.0.0.1:{PORT}, generated content",
         "settings": "both at defaults: 8 connections",

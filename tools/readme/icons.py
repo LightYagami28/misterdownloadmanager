@@ -16,9 +16,9 @@ import base64
 import io
 import json
 import os
-import urllib.request
 from pathlib import Path
 
+import requests
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -73,13 +73,14 @@ def draw(subject, reference):
         # OpenAI's image options: a transparent background.
         "image_config": {"background": "transparent"},
     }).encode()
-    req = urllib.request.Request(
+    r = requests.post(
         "https://openrouter.ai/api/v1/chat/completions",
         data=body,
         headers={"Authorization": f"Bearer {key()}", "Content-Type": "application/json"},
+        timeout=300,
     )
-    with urllib.request.urlopen(req, timeout=300) as r:
-        answer = json.load(r)
+    r.raise_for_status()
+    answer = r.json()
     message = answer["choices"][0]["message"]
     url = message["images"][0]["image_url"]["url"]
     cost = answer.get("usage", {}).get("cost")

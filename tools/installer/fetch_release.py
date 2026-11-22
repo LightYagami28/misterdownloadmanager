@@ -10,19 +10,12 @@ import json
 import os
 import sys
 import time
-import urllib.error
-import urllib.request
+
+import requests
 
 # Seconds to wait before each new try: about seven minutes in all.
 WAITS = (5, 15, 30, 60, 90, 90, 120)
 UA = "mdm-release-build"
-
-
-class NoRedirect(urllib.request.HTTPRedirectHandler):
-    """Hands a redirect back, so the token isn't sent on to the storage server."""
-
-    def redirect_request(self, *args, **kwargs):
-        return None
 
 
 def _get(url, token, accept):
@@ -30,17 +23,13 @@ def _get(url, token, accept):
     if token:
         headers["Authorization"] = f"Bearer {token}"
         headers["X-GitHub-Api-Version"] = "2022-11-28"
-    opener = urllib.request.build_opener(NoRedirect)
-    try:
-        with opener.open(urllib.request.Request(url, headers=headers), timeout=120) as r:
-            return r.read()
-    except urllib.error.HTTPError as e:
-        if e.code not in (301, 302, 303, 307, 308):
-            raise
-        target = e.headers["Location"]
-    req = urllib.request.Request(target, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=300) as r:
-        return r.read()
+    r = requests.get(url, headers=headers, timeout=120, allow_redirects=False)
+    if r.status_code in (301, 302, 303, 307, 308):
+        # Follow manually, without the token: it must not reach the storage server.
+        return requests.get(r.headers["Location"], headers={"User-Agent": UA},
+                            timeout=300).content
+    r.raise_for_status()
+    return r.content
 
 
 def _once(repo, tag, name, token):
@@ -61,11 +50,12 @@ def fetch(repo, tag, name):
     for wait in (*WAITS, None):
         try:
             return _once(repo, tag, name, token)
-        except urllib.error.HTTPError as e:
-            if e.code < 500 and e.code != 429:
-                sys.exit(f"{name}: HTTP {e.code}")
-            problem = f"HTTP {e.code}"
-        except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+        except requests.HTTPError as e:
+            status = e.response.status_code if e.response is not None else 0
+            if status < 500 and status != 429:
+                sys.exit(f"{name}: HTTP {status}")
+            problem = f"HTTP {status}"
+        except (requests.RequestException, TimeoutError, ConnectionError) as e:
             problem = str(e)
         if wait is None:
             sys.exit(f"{name}: gave up: {problem}")

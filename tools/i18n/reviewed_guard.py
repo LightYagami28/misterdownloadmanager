@@ -13,9 +13,14 @@ CI runs this on pull requests. translate.py itself never resends a reviewed row.
 """
 
 import argparse
+import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+GIT = shutil.which("git")
+if GIT is None:
+    raise RuntimeError("git not found on PATH")
 
 ROOT = Path(__file__).resolve().parents[2]
 I18N = ROOT / "i18n"
@@ -40,7 +45,7 @@ def rows(text):
 
 def at_base(base, path):
     try:
-        return subprocess.run(["git", "show", f"{base}:{path}"], cwd=ROOT, capture_output=True,
+        return subprocess.run([GIT, "show", f"{base}:{path}"], cwd=ROOT, capture_output=True,
                               check=True).stdout.decode("utf-8")
     except subprocess.CalledProcessError:
         return None  # the catalog is new on this side
