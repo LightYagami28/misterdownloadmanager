@@ -46,7 +46,7 @@ pub fn crashes_dir(data: &Path) -> PathBuf {
 pub fn stem(kind: Kind) -> String {
     format!(
         "{}-{}",
-        chrono::Local::now().format("%Y-%m-%d_%H-%M-%S"),
+        mdm_datetime::Local::now().format("%Y-%m-%d_%H-%M-%S"),
         kind.word()
     )
 }

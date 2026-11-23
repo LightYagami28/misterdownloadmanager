@@ -118,13 +118,13 @@ pub fn system() -> Regional {
 
 /// `t` as a short date and time, in the formats in use: `30/10/2026 21:41:00`,
 /// `10/30/2026 9:41:00 PM`, `2026-10-30 21:41:00`.
-pub fn short_date_time(t: chrono::NaiveDateTime) -> String {
+pub fn short_date_time(t: mdm_datetime::NaiveDateTime) -> String {
     format_with(current(), t)
 }
 
 /// [`short_date_time`] in the formats `f`.
-pub fn format_with(f: Formats, t: chrono::NaiveDateTime) -> String {
-    use chrono::Timelike;
+pub fn format_with(f: Formats, t: mdm_datetime::NaiveDateTime) -> String {
+    use mdm_datetime::Timelike;
     format!(
         "{} {}",
         date_with(f, t.date()),
@@ -133,12 +133,12 @@ pub fn format_with(f: Formats, t: chrono::NaiveDateTime) -> String {
 }
 
 /// A date alone, in the current formats: `31/10/2026`.
-pub fn short_date(d: chrono::NaiveDate) -> String {
+pub fn short_date(d: mdm_datetime::NaiveDate) -> String {
     date_with(current(), d)
 }
 
-fn date_with(f: Formats, t: chrono::NaiveDate) -> String {
-    use chrono::Datelike;
+fn date_with(f: Formats, t: mdm_datetime::NaiveDate) -> String {
+    use mdm_datetime::Datelike;
     let (y, m, d) = (t.year(), t.month(), t.day());
     match f.order {
         DateOrder::Dmy => format!("{d:02}/{m:02}/{y}"),
@@ -213,7 +213,7 @@ mod tests {
 
     #[test]
     fn dates_and_times_are_written_in_each_order() {
-        let t = chrono::NaiveDate::from_ymd_opt(2026, 10, 30)
+        let t = mdm_datetime::NaiveDate::from_ymd_opt(2026, 10, 30)
             .unwrap()
             .and_hms_opt(21, 41, 5)
             .unwrap();

@@ -727,7 +727,7 @@ pub fn session(language: &str, dark: bool) -> Session {
         exe: std::env::current_exe()
             .map(|p| p.display().to_string())
             .unwrap_or_default(),
-        started: chrono::Utc::now().timestamp(),
+        started: mdm_datetime::Utc::now().timestamp(),
         // Known once the window started (renderer.rs).
         renderer: String::new(),
     }

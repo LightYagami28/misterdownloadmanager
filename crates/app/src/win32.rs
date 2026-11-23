@@ -5056,8 +5056,8 @@ pub fn region_formats() -> Option<(crate::regional::DateOrder, bool, u8)> {
 
 /// `t` (local time) as the user's Windows region writes a short date and a time with seconds
 /// (Control Panel → Region): `30/10/2026 00:38:09`, `2026/10/30 0:38:09`… None if Windows can't.
-pub fn local_date_time(t: chrono::NaiveDateTime) -> Option<String> {
-    use chrono::{Datelike, Timelike};
+pub fn local_date_time(t: mdm_datetime::NaiveDateTime) -> Option<String> {
+    use mdm_datetime::{Datelike, Timelike};
     use windows_sys::Win32::Foundation::SYSTEMTIME;
     use windows_sys::Win32::Globalization::{DATE_SHORTDATE, GetDateFormatEx, GetTimeFormatEx};
     let st = SYSTEMTIME {

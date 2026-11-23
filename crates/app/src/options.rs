@@ -5103,7 +5103,7 @@ fn kept_text(kept: crate::secrets::Kept) -> Option<&'static str> {
 fn snooze_line(ui: &mut Ui, p: &egui::Painter, o: Pos2, until: crate::finish::Until) -> bool {
     let line = match until {
         crate::finish::Until::At(t) => {
-            use chrono::Timelike;
+            use mdm_datetime::Timelike;
             let at = crate::clock::local_at(t)
                 .map(|t| crate::regional::clock_time(t.hour(), t.minute()))
                 .unwrap_or_default();

@@ -1,0 +1,37 @@
+[package]
+name = "librqbit-dht"
+version = "9.1.0"
+edition = "2024"
+description = "DHT implementation, used in rqbit torrent client."
+license = "Apache-2.0"
+documentation = "https://docs.rs/librqbit-dht"
+repository = "https://github.com/ikatson/rqbit"
+readme = "README.md"
+
+[dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "sync"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+serde = { version = "1" }
+serde_derive = { version = "1" }
+leaky-bucket = { version = "1.1" }
+serde_json = { version = "1" }
+buffers = { package = "librqbit-buffers", version = "9.1.0" }
+bencode = { package = "librqbit-bencode", version = "9.1.0", default-features = false }
+anyhow = { version = "1" }
+parking_lot = { version = "0.12" }
+tracing = { version = "0.1" }
+backon = { version = "1.5", features = ["tokio-sleep"] }
+futures = { version = "0.3" }
+rand = { version = "0.10" }
+indexmap = { version = "2" }
+dashmap = { version = "6", features = ["serde"] }
+clone_to_owned = { package = "librqbit-clone-to-owned", version = "9.1.0" }
+librqbit-core = { version = "9.1.0", default-features = false }
+jiff = { version = "1.0.2", default-features = false, features = ["std", "serde"] }
+tokio-util = { version = "0.7" }
+bytes = { version = "1" }
+librqbit-dualstack-sockets = { version = "0.7" }
+thiserror = { version = "2" }
+
+[dev-dependencies]
+tracing-subscriber = { version = "0.3", default-features = false }

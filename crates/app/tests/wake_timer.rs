@@ -66,8 +66,8 @@ async fn the_computer_is_woken_for_the_queue_and_kept_awake_while_it_runs() {
         "description": "", "resumable": false, "added": "Nov 06 10:00:00 2026",
         "log": [],
     });
-    let start = chrono::Local::now() + chrono::Duration::seconds(75);
-    use chrono::{Datelike, Timelike};
+    let start = mdm_datetime::Local::now() + mdm_datetime::Duration::seconds(75);
+    use mdm_datetime::{Datelike, Timelike};
     let schedule = serde_json::json!({
         "start_at": [start.hour(), start.minute(), start.second()],
         "once": [start.year(), start.month(), start.day()],
@@ -103,8 +103,8 @@ async fn the_computer_is_woken_for_the_queue_and_kept_awake_while_it_runs() {
                 "wake: the computer wakes at",
                 Duration::from_secs(30),
             );
-            let wake = (start - chrono::Duration::seconds(60))
-                .with_timezone(&chrono::Utc)
+            let wake = (start - mdm_datetime::Duration::seconds(60))
+                .with_timezone(&mdm_datetime::Utc)
                 .format("%Y-%m-%d %H:%M:%S")
                 .to_string();
             assert!(set.contains(&wake), "{set:?} is not for {wake} UTC");

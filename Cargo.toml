@@ -14,6 +14,8 @@ publish = false
 mdm-cli = { path = "crates/cli" }
 mdm-cnl = { path = "crates/cnl" }
 mdm-crash = { path = "crates/crash", default-features = false }
+mdm-datetime = { path = "crates/datetime" }
+jiff = "1.0.2"
 mdm-debrid = { path = "crates/debrid" }
 # Without its browser-like connection unless asked (the app asks: its `browser-connection`).
 mdm-engine = { path = "crates/engine", default-features = false }
@@ -81,7 +83,6 @@ windows-sys = { version = "0.61.2", features = [
     "Win32_UI_WindowsAndMessaging",
 ] }
 base64 = "0.23.1"
-chrono = { version = "0.4.45", default-features = false, features = ["clock"] }
 open = "5.4.5"
 
 anyhow = "1.0.104"
@@ -113,7 +114,7 @@ webpki-root-certs = "1.0.11"
 reqwest = { version = "0.13.5", default-features = false, features = ["rustls", "stream", "system-proxy", "socks"] }
 # FTP and FTPS (crates/engine/src/ftp.rs), with TLS through the rustls and platform verifier
 # reqwest uses. "deprecated" is what enables implicit FTPS (ftps://, port 990).
-suppaftp = { version = "12.2.1", default-features = false, features = ["tokio-rustls-aws-lc-rs", "deprecated"] }
+suppaftp = { version = "13.0.0", default-features = false, features = ["tokio-rustls-aws-lc-rs", "deprecated"] }
 rustls = { version = "0.23.46", default-features = false, features = ["aws-lc-rs", "std", "tls12", "logging"] }
 rustls-platform-verifier = "0.7.1"
 # Custom DNS (#36): plain DNS, DNS over TLS and over HTTPS, with aws-lc-rs (no ring) and the
@@ -225,6 +226,24 @@ debug = "line-tables-only"
 # mdm/glow-texture-no-panic, #1173).
 # craft-libs can take the same commits to share one egui again.
 [patch.crates-io]
+# object 0.36 pinned ruzstd 0.7 (RUSTSEC-2026-0344). object 0.41 uses ruzstd 0.9, patched.
+object = { path = "vendor/object" }
+# samply-symbols 0.24.1 is the current release; this copy lets it use object 0.41.
+samply-symbols = { path = "vendor/samply-symbols" }
+# serde_with 3.25 keeps an optional chrono 0.4 dependency in the lockfile even when its feature
+# is off. No crate here enables that feature; this copy omits the dead optional dependency.
+serde_with = { path = "vendor/serde_with" }
+# librqbit-utp 0.7.0 pins ringbuf 0.4, whose skip/clear can double-free (RUSTSEC-2026-0293).
+# This copy keeps the same API and uses the patched ringbuf 0.6.
+librqbit-utp = { path = "vendor/librqbit-utp" }
+# rmcp 3.x depends on the unmaintained chrono (RUSTSEC-2026-0543). This copy keeps the SDK and
+# uses jiff for the same RFC 3339 timestamps; schemars no longer enables the chrono04 feature.
+rmcp = { path = "vendor/rmcp" }
+# zvariant/zbus_names/zvariant_derive (RUSTSEC-2026-0370/0371/0372) were merged into zbus 6.
+# The standalone crates are replaced by thin compatibility layers over maintained zbus 6.
+zvariant = { path = "vendor/zvariant" }
+zbus_names = { path = "vendor/zbus-names" }
+
 # librqbit 9.1.0 with per-torrent rate limits that change while a torrent runs (#39), and a
 # magnet lookup's progress counted (#92), and every socket bound to one address (`bind_ip`,
 # #143), and every HTTP client of a session built through MDM's TLS setup (`configure_http_client`:
@@ -238,7 +257,6 @@ librqbit-bencode = { git = "https://github.com/anefzaoui/rqbit.git", rev = "fab0
 librqbit-buffers = { git = "https://github.com/anefzaoui/rqbit.git", rev = "fab046042915709ab160626ebc59cce08de4d779" }
 librqbit-clone-to-owned = { git = "https://github.com/anefzaoui/rqbit.git", rev = "fab046042915709ab160626ebc59cce08de4d779" }
 librqbit-core = { git = "https://github.com/anefzaoui/rqbit.git", rev = "fab046042915709ab160626ebc59cce08de4d779" }
-librqbit-dht = { git = "https://github.com/anefzaoui/rqbit.git", rev = "fab046042915709ab160626ebc59cce08de4d779" }
 librqbit-lsd = { git = "https://github.com/anefzaoui/rqbit.git", rev = "fab046042915709ab160626ebc59cce08de4d779" }
 librqbit-peer-protocol = { git = "https://github.com/anefzaoui/rqbit.git", rev = "fab046042915709ab160626ebc59cce08de4d779" }
 librqbit-sha1-wrapper = { git = "https://github.com/anefzaoui/rqbit.git", rev = "fab046042915709ab160626ebc59cce08de4d779" }
@@ -271,3 +289,7 @@ wgpu-core-deps-windows-linux-android = { git = "https://github.com/anefzaoui/wgp
 wgpu-hal = { git = "https://github.com/anefzaoui/wgpu.git", rev = "1c6f336e239ff7bc46b4dec194f1d96d3d4f8e04" }
 wgpu-naga-bridge = { git = "https://github.com/anefzaoui/wgpu.git", rev = "1c6f336e239ff7bc46b4dec194f1d96d3d4f8e04" }
 wgpu-types = { git = "https://github.com/anefzaoui/wgpu.git", rev = "1c6f336e239ff7bc46b4dec194f1d96d3d4f8e04" }
+
+# librqbit-dht is a git dependency; patch that source to replace chrono with jiff.
+[patch."https://github.com/anefzaoui/rqbit.git"]
+librqbit-dht = { path = "vendor/librqbit-dht" }

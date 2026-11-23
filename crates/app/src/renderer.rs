@@ -1011,7 +1011,7 @@ impl Failure {
 
 /// A date for the log and the crash reports (UTC): `2026-11-13`.
 fn day(secs: u64) -> String {
-    chrono::DateTime::from_timestamp(secs.min(i64::MAX as u64) as i64, 0)
+    mdm_datetime::DateTime::from_timestamp(secs.min(i64::MAX as u64) as i64, 0)
         .map_or_else(|| secs.to_string(), |d| d.format("%Y-%m-%d").to_string())
 }
 
