@@ -130,7 +130,7 @@ def main():
     else:
         open(asset_path, "wb").write(prog + b"\n" + marker)
         if os.name != "nt":
-            os.chmod(asset_path, 0o755)
+            os.chmod(asset_path, 0o700)
 
     digest = hashlib.sha256(open(asset_path, "rb").read()).hexdigest()
     if a.sums == "bad":

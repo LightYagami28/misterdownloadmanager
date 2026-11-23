@@ -13,7 +13,7 @@ import hashlib
 import http.server
 import json
 import os
-import random
+import secrets
 import re
 import shutil
 import struct
@@ -108,7 +108,7 @@ def main():
         sys.exit(f"misterdownloadmanager-mcp --version: {out.returncode} {out.stdout!r} {out.stderr!r}")
     print(out.stdout.strip())
 
-    body = random.Random(668).randbytes(SIZE)
+    body = secrets.token_bytes(SIZE)
     server, url = serve(body)
     work = tempfile.mkdtemp(prefix="mdm-smoke-")
     try:
