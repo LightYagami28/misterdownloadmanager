@@ -106,6 +106,8 @@ base64 = [
     "dep:base64",
     "alloc",
 ]
+chrono = []
+chrono_0_4 = []
 default = [
     "std",
     "macros",

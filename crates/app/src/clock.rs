@@ -244,7 +244,7 @@ mod tests {
         // Let go: the answers come.
         drop(held);
         assert!(until(Duration::from_secs(5), || c.known().then_some(())).is_some());
-        assert_eq!(c.now().offset(), &two_hours);
+        assert_eq!(c.now().offset(), two_hours);
         let utc = until(Duration::from_secs(5), || c.exact_utc(local));
         assert_eq!(
             utc,
