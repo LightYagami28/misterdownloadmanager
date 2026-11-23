@@ -26,7 +26,7 @@ import importlib
 import argparse
 import json
 import os
-import random
+import secrets
 import re
 import sys
 import threading
@@ -486,7 +486,7 @@ def call(key, model, system, items, spend, max_tokens=8192, reasoning=None):
         # A dropped or reset connection (ConnectionResetError is an OSError) is tried again too.
         except (urllib.error.URLError, OSError, json.JSONDecodeError, KeyError, IndexError):
             pass
-        time.sleep(min(60, 2 ** attempt) * (0.5 + random.random()))
+        time.sleep(min(60, 2 ** attempt) * (0.5 + secrets.randbelow(1000) / 1000.0))
     raise RuntimeError("gave up after 8 attempts")
 
 
