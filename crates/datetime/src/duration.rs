@@ -16,7 +16,7 @@ impl Duration {
         Self(jiff::SignedDuration::ZERO)
     }
 
-    pub fn seconds(secs: i64) -> Self {
+    pub const fn seconds(secs: i64) -> Self {
         Self(jiff::SignedDuration::from_secs(secs))
     }
 

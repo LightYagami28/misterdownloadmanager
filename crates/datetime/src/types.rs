@@ -1,6 +1,6 @@
 //! Date and time value types.
 
-use std::marker::PhantomData;
+use std::{fmt, marker::PhantomData};
 
 use jiff::{Timestamp, civil, tz::TimeZone as JiffTimeZone};
 
@@ -9,7 +9,7 @@ use crate::{
 };
 
 /// A timestamp in an instant-like time zone.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct DateTime<Tz> {
     pub(crate) ts: Timestamp,
     zone: PhantomData<Tz>,
@@ -52,6 +52,15 @@ impl<Tz> DateTime<Tz> {
         self.naive_local().date()
     }
 
+    pub fn date_naive(&self) -> NaiveDate {
+        self.date()
+    }
+
+    pub fn num_seconds_from_midnight(&self) -> u32 {
+        let t = self.naive_local().time();
+        t.0.hour() as u32 * 3_600 + t.0.minute() as u32 * 60 + t.0.second() as u32
+    }
+
     pub fn format(&self, fmt: &str) -> Formatted<'_> {
         Formatted::new(fmt, FormattedValue::Timestamp(&self.ts))
     }
@@ -75,14 +84,7 @@ impl<Tz> DateTime<Tz> {
         self.ts.to_string()
     }
 
-    pub fn from_timestamp(secs: i64, nsecs: u32) -> Option<Self> {
-        Timestamp::from_second(secs)
-            .ok()
-            .and_then(|ts| ts.checked_add(jiff::SignedDuration::from_nanos(nsecs as i64)).ok())
-            .map(Self::from)
-    }
-
-    pub fn from_naive_utc_and_offset(naive: NaiveDateTime, _offset: FixedOffset) -> Self {
+    pub fn from_naive_utc_and_offset<Tz2>(naive: NaiveDateTime, _offset: Tz2) -> Self {
         Self::from(utc_ts(naive.0))
     }
 }
@@ -90,6 +92,13 @@ impl<Tz> DateTime<Tz> {
 impl DateTime<Utc> {
     pub fn now() -> Self {
         Self::from(Timestamp::now())
+    }
+
+    pub fn from_timestamp(secs: i64, nsecs: u32) -> Option<Self> {
+        Timestamp::from_second(secs)
+            .ok()
+            .and_then(|ts| ts.checked_add(jiff::SignedDuration::from_nanos(nsecs as i64)).ok())
+            .map(Self::from)
     }
 
     pub fn parse_from_rfc3339(s: &str) -> Result<Self, jiff::Error> {
@@ -123,7 +132,7 @@ impl<Tz> std::ops::Sub<Duration> for DateTime<Tz> {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct NaiveDateTime(pub(crate) civil::DateTime);
 
 impl NaiveDateTime {
@@ -137,6 +146,10 @@ impl NaiveDateTime {
 
     pub fn time(&self) -> NaiveTime {
         NaiveTime(self.0.time())
+    }
+
+    pub fn and_utc(&self) -> DateTime<Utc> {
+        DateTime::from(utc_ts(self.0))
     }
 
     pub fn format(&self, fmt: &str) -> Formatted<'_> {
@@ -165,6 +178,14 @@ impl std::ops::Add<Duration> for NaiveDateTime {
     }
 }
 
+impl std::ops::Sub<Duration> for NaiveDateTime {
+    type Output = NaiveDateTime;
+    fn sub(self, rhs: Duration) -> Self {
+        let ts = utc_ts(self.0) - rhs.get();
+        Self(ts.to_zoned_datetime(JiffTimeZone::UTC).datetime())
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct NaiveDate(pub(crate) civil::Date);
 
@@ -189,6 +210,11 @@ impl NaiveDate {
         civil::Date::new(self.0.year(), self.0.month(), day as i8).ok().map(Self)
     }
 
+    pub fn with_year(self, year: i32) -> Option<Self> {
+        let year = i16::try_from(year).ok()?;
+        civil::Date::new(year, self.0.month(), self.0.day()).ok().map(Self)
+    }
+
     pub fn format(&self, fmt: &str) -> Formatted<'_> {
         Formatted::new(fmt, FormattedValue::Date(&self.0))
     }
@@ -203,6 +229,26 @@ impl std::ops::Add<Duration> for NaiveDate {
     fn add(self, rhs: Duration) -> Self {
         let ts = utc_ts(self.at_midnight().0) + rhs.get();
         Self(ts.to_zoned_datetime(JiffTimeZone::UTC).date())
+    }
+}
+
+impl std::ops::Sub<Duration> for NaiveDate {
+    type Output = NaiveDate;
+    fn sub(self, rhs: Duration) -> Self {
+        let ts = utc_ts(self.at_midnight().0) - rhs.get();
+        Self(ts.to_zoned_datetime(JiffTimeZone::UTC).date())
+    }
+}
+
+impl<Tz> fmt::Display for DateTime<Tz> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.ts.to_string())
+    }
+}
+
+impl fmt::Display for NaiveDateTime {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0.to_string())
     }
 }
 
@@ -226,3 +272,4 @@ impl NaiveTime {
         ))
     }
 }
+

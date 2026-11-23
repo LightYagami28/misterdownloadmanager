@@ -21,7 +21,7 @@
 
 use std::sync::mpsc::{Receiver, Sender};
 
-use mdm_datetime::{DateTime, Datelike, Duration, Local, NaiveDateTime, TimeZone, Utc};
+use mdm_datetime::{DateTime, Datelike, Duration, Local, NaiveDateTime, Utc};
 
 use crate::queue::{Queue, Schedule};
 
