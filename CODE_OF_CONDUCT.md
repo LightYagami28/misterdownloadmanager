@@ -33,7 +33,7 @@ remove, edit, or reject comments, commits, code, issues, and other
 contributions that do not align with them.
 
 Instances of unacceptable behaviour may be reported privately to
-developer@lightyagami.dev. All reports will be reviewed and investigated
+<developer@lightyagami.dev>. All reports will be reviewed and investigated
 promptly and fairly. Maintainers are obliged to respect the privacy and
 security of the reporter.
 
