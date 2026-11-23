@@ -53,7 +53,7 @@ impl Cubic {
     pub fn new(now: Instant, mss: usize) -> Cubic {
         Cubic {
             cwnd: 2.,
-            ssthresh: f64::INFINITY,
+            ssthresh: <f64>::INFINITY,
 
             k: 0.,
             w_max: 0.,
