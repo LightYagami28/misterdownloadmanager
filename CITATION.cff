@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it."
+title: "misterdownloadmanager"
+abstract: "Clean-room download manager written from scratch in Rust for Windows, macOS and Linux."
+type: software
+version: 0.5.2
+date-released: 2026-11-09
+license: GPL-3.0-or-later
+repository-code: "https://github.com/LightYagami28/misterdownloadmanager"
+authors:
+  - family-names: Maule
+    given-names: Alessandro
+    alias: "Light Yagami"
+  - family-names: Nefzaoui
+    given-names: Ahmed
+    alias: "anefzaoui"
+keywords:
+  - Rust
+  - download-manager
+  - clean-room
+  - cross-platform
