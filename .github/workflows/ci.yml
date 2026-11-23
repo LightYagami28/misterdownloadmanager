@@ -231,6 +231,6 @@ jobs:
       - name: Installa gli scanner
         run: python -m pip install bandit pip-audit
       - name: SAST
-        run: python -m bandit -r tools
+        run: python -m bandit -r tools -c .bandit
       - name: SCA
         run: python -m pip_audit -r requirements-tools.txt
