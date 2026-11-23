@@ -82,10 +82,6 @@ impl<Tz> DateTime<Tz> {
             .map(Self::from)
     }
 
-    pub fn parse_from_rfc3339(s: &str) -> Result<Self, jiff::Error> {
-        s.parse::<Timestamp>().map(Self::from)
-    }
-
     pub fn from_naive_utc_and_offset(naive: NaiveDateTime, _offset: FixedOffset) -> Self {
         Self::from(utc_ts(naive.0))
     }
@@ -94,6 +90,10 @@ impl<Tz> DateTime<Tz> {
 impl DateTime<Utc> {
     pub fn now() -> Self {
         Self::from(Timestamp::now())
+    }
+
+    pub fn parse_from_rfc3339(s: &str) -> Result<Self, jiff::Error> {
+        s.parse::<Timestamp>().map(Self::from)
     }
 }
 
