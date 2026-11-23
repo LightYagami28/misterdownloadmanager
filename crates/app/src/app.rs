@@ -7091,7 +7091,7 @@ impl App {
 
     /// Scheduler times, then start what running queues allow (notes/ENGINE.md §5).
     fn tick_queues(&mut self) {
-        use mdm_datetime::{Datelike, Timelike};
+        use mdm_datetime::Datelike;
         // The local time with the offset the clock's thread keeps: asking Windows here held the
         // window for 8 s (#536). Until its first answer, schedules wait.
         let local = crate::clock::now_known();

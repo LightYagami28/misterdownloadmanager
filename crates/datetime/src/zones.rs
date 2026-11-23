@@ -4,14 +4,28 @@ use jiff::{Timestamp, tz::TimeZone as JiffTimeZone};
 
 use crate::{DateTime, NaiveDate, NaiveDateTime, utc_ts};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Utc;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Local;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct FixedOffset(pub(crate) i32);
+
+impl FixedOffset {
+    pub fn east_opt(secs: i32) -> Option<Self> {
+        if secs < -86_399 || secs > 86_399 {
+            None
+        } else {
+            Some(Self(secs))
+        }
+    }
+
+    pub fn local_minus_utc(self) -> i32 {
+        self.0
+    }
+}
 
 pub trait TimeZone {
     fn offset_from_utc_datetime(&self, utc: &NaiveDateTime) -> FixedOffset;
