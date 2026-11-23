@@ -1,7 +1,7 @@
 # Security
 
 Please report security problems privately, not in a public issue: email
-**developer@lightyagami.dev**, or use GitHub's
+**maule2703@gmail.com**, or use GitHub's
 **[Report a vulnerability](https://github.com/LightYagami28/misterdownloadmanager/security/advisories/new)**
 form on this repository. Say what you found, how to reproduce it, and which version you used
 (**Help → About** shows it).
