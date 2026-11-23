@@ -1612,8 +1612,8 @@ pub fn now_stamp() -> String {
 const STAMP: &str = "%b %d %H:%M:%S %Y";
 
 /// A stored stamp as a time (local), for sorting and for `date_text`.
-pub fn stamp_time(stored: &str) -> Option<chrono::NaiveDateTime> {
-    chrono::NaiveDateTime::parse_from_str(stored.trim(), STAMP).ok()
+pub fn stamp_time(stored: &str) -> Option<mdm_datetime::NaiveDateTime> {
+    mdm_datetime::NaiveDateTime::parse_from_str(stored.trim(), STAMP).ok()
 }
 
 /// A stored stamp as the list shows it: in the formats chosen in Options → Regional; else IDM's
@@ -1629,7 +1629,7 @@ pub fn date_text(stored: &str) -> String {
 
 /// A local time as the interface writes dates and times (Options → Regional; IDM's text in
 /// English, on the system's clock; the Windows region's elsewhere).
-pub fn when_text(t: chrono::NaiveDateTime) -> String {
+pub fn when_text(t: mdm_datetime::NaiveDateTime) -> String {
     let formats = crate::regional::current();
     if formats.custom {
         return crate::i18n::ltr(&crate::regional::short_date_time(t));
@@ -1646,8 +1646,8 @@ pub fn when_text(t: chrono::NaiveDateTime) -> String {
 
 /// IDM's text for a time, as stored (`Oct 28 21:44:12 2026`) on a 24-hour clock, and with the
 /// system's 12-hour clock (#392) `Oct 28 9:44:12 PM 2026`.
-fn stamp_text(t: chrono::NaiveDateTime, clock24: bool) -> String {
-    use chrono::Timelike;
+fn stamp_text(t: mdm_datetime::NaiveDateTime, clock24: bool) -> String {
+    use mdm_datetime::Timelike;
     format!(
         "{} {} {}",
         t.format("%b %d"),

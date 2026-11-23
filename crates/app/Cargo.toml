@@ -25,9 +25,9 @@ browser-connection = ["mdm-engine/browser-connection"]
 test-update = ["mdm-tools/test-update"]
 
 [dependencies]
+mdm-datetime.workspace = true
 arboard.workspace = true
 base64.workspace = true
-chrono.workspace = true
 craft-atomic.workspace = true
 dirs.workspace = true
 eframe.workspace = true
@@ -90,9 +90,10 @@ raw-window-handle = "0.6"
 # (win32.rs `graphics_drivers`, #1205; wgpu-hal builds it too).
 windows = { version = "0.62", default-features = false, features = ["Win32_Graphics_DirectWrite", "Win32_Graphics_Dxgi"] }
 
-# The notification-area icon and its menu (tray.rs).
+# The notification-area icon and its menu (tray.rs). The KSNI backend is the only one MDM
+# uses: the default libappindicator backend would pull GTK 3 and glib 0.18 into the build.
 [target.'cfg(not(target_os = "linux"))'.dependencies]
-tray-icon = "0.26.1"
+tray-icon = { version = "0.26.1", default-features = false, features = ["ksni"] }
 # Windows and macOS: the system's font for a script MDM's font lists don't name (theme.rs,
 # #1125). Linux asks fontconfig for any script already (`fc-match :charset=`).
 egui_system_font_provider.workspace = true

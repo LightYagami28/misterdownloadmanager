@@ -4671,7 +4671,7 @@ fn rtc_offset() -> i64 {
         .ok()
         .and_then(|s| s.trim().parse::<i64>().ok());
     match chip {
-        Some(chip) => chip - chrono::Utc::now().timestamp(),
+        Some(chip) => chip - mdm_datetime::Utc::now().timestamp(),
         None => 0,
     }
 }

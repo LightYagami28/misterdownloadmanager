@@ -2719,7 +2719,7 @@ pub struct LimitNotice {
 impl LimitNotice {
     pub fn new(mb: u32, hours: u32, wait: std::time::Duration) -> Self {
         let at = crate::clock::now()
-            + chrono::Duration::from_std(wait).unwrap_or_else(|_| chrono::Duration::zero());
+            + mdm_datetime::Duration::from_std(wait).unwrap_or_else(|_| mdm_datetime::Duration::zero());
         LimitNotice {
             lines: [
                 crate::i18n::fmt(

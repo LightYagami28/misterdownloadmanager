@@ -19,7 +19,7 @@ use std::sync::atomic::{AtomicBool, AtomicI32, AtomicI64, Ordering};
 use std::sync::{Arc, Mutex, OnceLock, mpsc};
 use std::time::Duration;
 
-use chrono::{DateTime, FixedOffset, NaiveDateTime, TimeZone, Utc};
+use mdm_datetime::{DateTime, FixedOffset, NaiveDateTime, TimeZone, Utc};
 
 /// No answer yet (the minute of the last answer otherwise).
 const NONE: i64 = i64::MIN;
@@ -156,7 +156,7 @@ fn run(kept: &Kept, asked: &mpsc::Receiver<Ask>, offset_at: &OffsetAt, to_utc: &
 
 /// The system's offset at `utc` (asks the system: the clock's thread only).
 fn system_offset(utc: DateTime<Utc>) -> FixedOffset {
-    chrono::Local.offset_from_utc_datetime(&utc.naive_utc())
+    mdm_datetime::Local.offset_from_utc_datetime(&utc.naive_utc())
 }
 
 fn clock() -> &'static Clock {
@@ -256,7 +256,7 @@ mod tests {
     fn its_time_is_chronos() {
         let c = Clock::spawn(Box::new(system_offset), Box::new(crate::wake::to_utc));
         assert!(until(Duration::from_secs(10), || c.known().then_some(())).is_some());
-        let (ours, theirs) = (c.now(), chrono::Local::now());
+        let (ours, theirs) = (c.now(), mdm_datetime::Local::now());
         assert_eq!(ours.offset(), theirs.offset());
         let apart = (ours.naive_local() - theirs.naive_local())
             .num_milliseconds()
@@ -266,7 +266,7 @@ mod tests {
         let year = theirs.naive_local().date().format("%Y").to_string();
         let year: i32 = year.parse().unwrap();
         for month in [1, 7] {
-            let local = chrono::NaiveDate::from_ymd_opt(year + 1, month, 15)
+            let local = mdm_datetime::NaiveDate::from_ymd_opt(year + 1, month, 15)
                 .unwrap()
                 .and_hms_opt(23, 0, 0)
                 .unwrap();

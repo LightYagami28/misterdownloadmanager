@@ -2,7 +2,7 @@
 //! modes, as IDM's. Queues on the left; on the right the selected queue's Schedule and Files in
 //! the queue, or the Download limits page. Edits stay in a draft until Apply, Start now or Close.
 
-use chrono::{Datelike, Duration as Days, NaiveDate};
+use mdm_datetime::{Datelike, Duration as Days, NaiveDate};
 use egui::{Color32, Pos2, Rect, Sense, Ui, pos2, vec2};
 
 use crate::chrome::{IconKey, ShellIcons};
@@ -1396,8 +1396,8 @@ fn support_reason(s: &crate::wake::Support) -> Option<&'static str> {
 }
 
 /// "The computer will be woken on 06/11/2026 at 22:59:00", in the formats in use.
-fn wake_note(at: chrono::NaiveDateTime) -> String {
-    use chrono::Timelike;
+fn wake_note(at: mdm_datetime::NaiveDateTime) -> String {
+    use mdm_datetime::Timelike;
     let time = crate::regional::time_text(
         at.hour(),
         at.minute(),

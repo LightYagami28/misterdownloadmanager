@@ -78,8 +78,8 @@ async fn a_scheduled_queue_runs_while_minimized() {
         })
         .collect();
     // The start: a little ahead, so the window is minimized well before it.
-    let at = chrono::Local::now() + chrono::Duration::seconds(12);
-    use chrono::Timelike;
+    let at = mdm_datetime::Local::now() + mdm_datetime::Duration::seconds(12);
+    use mdm_datetime::Timelike;
     let schedule = serde_json::json!({
         "start_at": [at.hour(), at.minute(), at.second()], "days": [true, true, true, true, true, true, true],
     });
