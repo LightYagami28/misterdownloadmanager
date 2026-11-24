@@ -71,7 +71,7 @@ def main(win, out, grow=0, wait=2.0):
         run("xdotool", "mousemove", str(sw - 2), str(sh // 2))
         pixels = client(win)
         if pixels is not None:
-            digest = hashlib.md5(pixels).digest()
+            digest = hashlib.md5(pixels, usedforsecurity=False).digest()
             # One colour (each 4-byte pixel the same as the first): not drawn yet.
             drawn = pixels[:4] * (len(pixels) // 4) != pixels[: len(pixels) // 4 * 4]
             if digest == prev and drawn:
