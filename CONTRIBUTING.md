@@ -1,7 +1,7 @@
 # Contributing
 
 Thanks for helping with Mister Download Manager. Bug reports, ideas, translation fixes and pull
-requests are all welcome.
+requests are all welcome. Participation is governed by [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## Getting set up
 

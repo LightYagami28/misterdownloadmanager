@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Mister Download Manager"
+type: software
+version: 0.5.2
+license: GPL-3.0-or-later
+repository-code: "https://github.com/LightYagami28/misterdownloadmanager"
+abstract: "A free and open-source download manager for Windows and Linux."
+authors:
+  - family-names: Nefzaoui
+    given-names: Ahmed
+  - name: "Light Yagami"
