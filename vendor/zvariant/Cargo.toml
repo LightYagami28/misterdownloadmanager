@@ -1,0 +1,28 @@
+[package]
+name = "zvariant"
+version = "5.15.1"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
+description = "Compatibility layer over the maintained zbus 6 wire format"
+publish = false
+
+[features]
+default = ["std"]
+std = []
+derive = []
+enumflags2 = []
+serde = []
+option-as-array = ["zbus/option-as-array"]
+arrayvec = ["zbus/arrayvec"]
+camino = ["zbus/camino"]
+chrono = ["zbus/chrono"]
+heapless = ["zbus/heapless"]
+jiff = ["zbus/jiff"]
+serde_bytes = ["zbus/serde_bytes"]
+time = ["zbus/time"]
+url = ["zbus/url"]
+uuid = ["zbus/uuid"]
+
+[dependencies]
+zbus = { version = "6.5.0", default-features = false }

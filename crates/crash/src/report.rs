@@ -211,7 +211,7 @@ pub fn text(input: &Input, home: Option<&Path>) -> String {
         let _ = writeln!(s, "Language: {}", ss.language);
         let _ = writeln!(s, "Theme: {}", if ss.dark { "dark" } else { "light" });
         let _ = writeln!(s, "Program: {}", ss.exe);
-        if let Ok(now) = chrono::DateTime::parse_from_rfc3339(&input.time) {
+        if let Ok(now) = mdm_datetime::DateTime::parse_from_rfc3339(&input.time) {
             let up = now.timestamp() - ss.started;
             if up >= 0 {
                 let _ = writeln!(s, "Running for: {}", duration(up as u64));
@@ -335,7 +335,7 @@ pub fn make(
     });
     let input = Input {
         kind: Some(kind),
-        time: chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+        time: mdm_datetime::Utc::now().to_rfc3339_opts(mdm_datetime::SecondsFormat::Secs, true),
         notes: notes.clone(),
         analysis: analysis.as_ref(),
         log_tail: crate::logs::tail(data, 150),

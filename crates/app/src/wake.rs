@@ -21,7 +21,7 @@
 
 use std::sync::mpsc::{Receiver, Sender};
 
-use chrono::{DateTime, Datelike, Duration, Local, NaiveDateTime, TimeZone, Utc};
+use mdm_datetime::{DateTime, Datelike, Duration, Local, NaiveDateTime, Utc};
 
 use crate::queue::{Queue, Schedule};
 
@@ -61,9 +61,9 @@ impl Support {
 /// the next ticked weekday's. None without a start time, or when it can never come.
 pub fn next_start(s: &Schedule, now: NaiveDateTime) -> Option<NaiveDateTime> {
     let (h, m, sec) = s.start_at?;
-    let time = chrono::NaiveTime::from_hms_opt(h.into(), m.into(), sec.into())?;
+    let time = mdm_datetime::NaiveTime::from_hms_opt(h.into(), m.into(), sec.into())?;
     if let Some((y, mo, d)) = s.once {
-        let at = chrono::NaiveDate::from_ymd_opt(y, mo, d)?.and_time(time);
+        let at = mdm_datetime::NaiveDate::from_ymd_opt(y, mo, d)?.and_time(time);
         return (at > now).then_some(at);
     }
     (0..=7)
@@ -555,7 +555,7 @@ fn hold_awake(reason: Option<&str>) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::NaiveDate;
+    use mdm_datetime::NaiveDate;
 
     fn at(y: i32, mo: u32, d: u32, h: u32, mi: u32, s: u32) -> NaiveDateTime {
         NaiveDate::from_ymd_opt(y, mo, d)

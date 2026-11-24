@@ -15,6 +15,7 @@ default = ["browser-connection"]
 browser-connection = ["dep:wreq", "dep:wreq-util", "dep:rustls-native-certs", "dep:webpki-root-certs"]
 
 [dependencies]
+jiff.workspace = true
 wreq = { workspace = true, optional = true }
 wreq-util = { workspace = true, optional = true }
 rustls-native-certs = { workspace = true, optional = true }

@@ -1,0 +1,15 @@
+[package]
+name = "zbus_names"
+version = "4.3.5"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
+description = "Compatibility layer over the maintained zbus 6 names module"
+publish = false
+
+[features]
+default = []
+serde = []
+
+[dependencies]
+zbus = { version = "6.5.0", default-features = false }

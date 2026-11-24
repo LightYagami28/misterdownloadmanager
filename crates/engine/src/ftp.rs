@@ -326,9 +326,14 @@ impl Site {
             Err(e) => return Err(lost(e)),
         };
         let modified = match s.mdtm(&self.path).await {
-            Ok(t) => u64::try_from(t.and_utc().timestamp())
-                .ok()
-                .map(|secs| SystemTime::UNIX_EPOCH + Duration::from_secs(secs)),
+            Ok(t) => u64::try_from(
+                t.to_zoned_datetime(jiff::tz::TimeZone::UTC)
+                    .expect("a civil time is always valid in UTC")
+                    .timestamp()
+                    .as_second(),
+            )
+            .ok()
+            .map(|secs| SystemTime::UNIX_EPOCH + Duration::from_secs(secs)),
             Err(FtpError::UnexpectedResponse(_)) => None,
             Err(e) => return Err(lost(e)),
         };

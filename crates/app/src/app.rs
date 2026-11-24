@@ -7091,7 +7091,7 @@ impl App {
 
     /// Scheduler times, then start what running queues allow (notes/ENGINE.md §5).
     fn tick_queues(&mut self) {
-        use chrono::{Datelike, Timelike};
+        use mdm_datetime::Datelike;
         // The local time with the offset the clock's thread keeps: asking Windows here held the
         // window for 8 s (#536). Until its first answer, schedules wait.
         let local = crate::clock::now_known();
@@ -8553,7 +8553,7 @@ impl App {
     fn again_text(a: crate::renderer::Again) -> String {
         use crate::i18n::{fmt, t};
         let date = |secs: u64| {
-            chrono::DateTime::from_timestamp(secs.min(i64::MAX as u64) as i64, 0)
+            mdm_datetime::DateTime::from_timestamp(secs.min(i64::MAX as u64) as i64, 0)
                 .map(|d| {
                     // The kept offset (clock.rs, #536): chrono's own asks the system each time.
                     let local = crate::clock::local(d).date_naive();
@@ -10810,7 +10810,7 @@ impl App {
     /// runs (it was at most once a week). A new version's window comes to the front, as apps
     /// announce theirs. Not in off-screen test runs (their windows stay as asked).
     fn auto_update_check(&mut self, ctx: &egui::Context) {
-        let now = chrono::Utc::now().timestamp();
+        let now = mdm_datetime::Utc::now().timestamp();
         let first = self.update_checked_this_run.is_none()
             && self.started.elapsed() >= crate::help::CHECK_AFTER_START;
         let again = self
@@ -11865,7 +11865,7 @@ impl App {
 
 /// The wall clock, in unix seconds (a snooze's end, #741).
 fn unix_now() -> i64 {
-    chrono::Utc::now().timestamp()
+    mdm_datetime::Utc::now().timestamp()
 }
 
 /// The finished downloads whose progress windows close at `now` (then Download complete opens):

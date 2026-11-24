@@ -200,7 +200,7 @@ pub(crate) async fn device_token(http: &Http, device_code: &str) -> Result<Optio
 
 /// Seconds since 1970 of an RFC 3339 time, as TorBox writes them.
 pub(crate) fn unix_of(t: &str) -> Option<i64> {
-    chrono::DateTime::parse_from_rfc3339(t)
+    mdm_datetime::DateTime::parse_from_rfc3339(t)
         .ok()
         .map(|d| d.timestamp())
 }

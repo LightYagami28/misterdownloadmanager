@@ -567,7 +567,7 @@ fn log_line(message: &str) {
     }
     let line = format!(
         "{}  INFO nmhost mdm_nmhost: {message}\n",
-        chrono::Utc::now().format("%Y-%m-%dT%H:%M:%S%.6fZ")
+        mdm_datetime::Utc::now().format("%Y-%m-%dT%H:%M:%S%.6fZ")
     );
     if let Ok(mut f) = std::fs::OpenOptions::new()
         .create(true)
