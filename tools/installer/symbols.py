@@ -59,7 +59,7 @@ def fetch_dump_syms(work):
             out = os.path.join(work, exe)
             with open(out, "wb") as f:
                 f.write(t.extractfile(member).read())
-        os.chmod(out, 0o755)
+        os.chmod(out, 0o700)
     return out
 
 
